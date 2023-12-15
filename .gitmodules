@@ -1,0 +1,3 @@
+[submodule "io_extended_scene_vrm/ext/przemir/apply_modifier_for_object_with_shapekeys"]
+	path = io_extended_scene_vrm/ext/przemir/apply_modifier_for_object_with_shapekeys
+	url = https://github.com/przemir/ApplyModifierForObjectWithShapeKeys
