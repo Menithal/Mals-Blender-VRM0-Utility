@@ -1,6 +1,8 @@
 import bpy
 
+import re 
 from io_extended_scene_vrm.skeleton import skeleton_util
+from io_extended_scene_vrm.utility import blender_copy_re
 
 category = "VRM0 MalAv Tools"
 class ARMATURE_OT_VRM_EXTRA_Create_Armature(bpy.types.Operator):
@@ -20,9 +22,9 @@ class ARMATURE_OT_VRM_EXTRA_Create_Armature(bpy.types.Operator):
 
 class ARMATURE_OT_VRM_EXTRA_Set_Pose_Operator(bpy.types.Operator):
     """ Tool to quickly set the skeleton pose into a reference VRM T Pose, 
-    This allows you to check rolls, rotations, and adjust bone positions before final binding """
+    This allows you to TEST rolls, rotations, and adjust bone positions before final binding """
     bl_idname = "io_extended_scene_vrm.set_t_pose"
-    bl_label = "Test T-Pose Rotations"
+    bl_label = "Test T-Pose"
 
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -37,22 +39,27 @@ class ARMATURE_OT_VRM_EXTRA_Set_Pose_Operator(bpy.types.Operator):
         return context.mode == "OBJECT"
 
     def execute(self, context):
+        armature = skeleton_util.find_armature(context.selected_objects)
+        armature.location.x = 0
+        armature.location.z = 0
+        armature.location.y = 0
         # TODO: If Adjusting Hips, Adjust hips position to make sure that bounding box of the entire armature has the feet touching the plane
-        skeleton_util.pose_to_vrm_reference(context.selected_objects)
+        skeleton_util.pose_to_vrm_reference(context,context.selected_objects)
         return {'FINISHED'}
     
 
 # TODO: Check that T Pose is  applied, If ANY BONES are moved, Cancel and Dialog Warn.
-
-
-class ARMATURE_OT_VRM_EXTRA_Create_T_Pose_Operator(bpy.types.Operator):
-    """ Does the Following Actions
-    - Duplicates VRM armature and all its child objects as a backup, 
-    - Forces T pose, If any bones are rotated, cancels.
-    - Applies new T Pose armature for ALL Shapekeys
-    - Sets the T Pose as final rest pose"""
+class ARMATURE_OT_VRM_EXTRA_Bind_T_Pose_Operator(bpy.types.Operator):
+    """ This should be your FINAL step before Export. Any customization should be baked down before attempting to use this.
+     Does the Following Actions
+    - Duplicates VRM armature and all its child objects to do Operations on
+    - Puts The new Duplicates to "Final-VRM-Export" Collection and adds -VRM to end of the Mesh and Armature
+    - Forces T pose, 
+    - Applies new T Pose armature for ALL Shapekeys, This may take a while (note: HIGHLY DESTRUCTIVE: May cause some issues with using tool mirrorings)
+    - Sets the T Pose as final rest pose (note: HIGHLY DESTRUCTIVE: existing animations need to be retargeted for new rest pose)
+    """
     bl_idname = "io_extended_scene_vrm.bind_t_pose_asset"
-    bl_label = "Bind T-Pose"
+    bl_label = "Finalize T-Pose"
 
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -65,19 +72,70 @@ class ARMATURE_OT_VRM_EXTRA_Create_T_Pose_Operator(bpy.types.Operator):
 
     def execute(self, context):
         # TODO: Duplicate and Apply all 
-        
+        print("Starting io_extended_scene_vrm.bind_t_pose_asset")
         armature = skeleton_util.find_armature(context.selected_objects)
-        t_pose_action_name = armature.name + "_t_pose"
-        bpy.context.scene.frame_current = 0
-        if bpy.data.actions.find(t_pose_action_name) == -1:
-            print("Did not find generated_t_pose action, creating...")
-            bpy.data.actions.new(t_pose_action_name)
-       
-        t_pose_action = bpy.data.actions[t_pose_action_name]
-        bpy.context.active_object.animation_data.action = t_pose_action
 
-        skeleton_util.pose_to_vrm_reference(context.selected_objects)
-        armature.data.vrm_addon_extension.vrm0.humanoid.pose_library = t_pose_action
+        print("Found Armature, Cloning Armature and Existing visible children")
+               
+        for obj in context.selected_objects:
+            obj.select_set(False)
+        
+        for child in armature.children:
+            if child.hide_get() == True: continue
+            print("Selecting",child.name)
+            child.select_set(True)
+        armature.select_set(True)
+
+        print("Duplicating")
+        bpy.ops.object.duplicate_move(OBJECT_OT_duplicate={"linked":False, "mode":'TRANSLATION'}, TRANSFORM_OT_translate={"value":(0, 0, 0), "orient_type":'GLOBAL', "orient_matrix":((1, 0, 0), (0, 1, 0), (0, 0, 1)), "orient_matrix_type":'GLOBAL', "constraint_axis":(False, False, False), "mirror":True, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "release_confirm":False, "use_accurate":False})
+        
+        # Hide Originals
+        print("Hide Originals for their safety")
+        armature.hide_set(True)
+        for child in armature.children:
+            child.hide_set(True)
+        
+        if "VRM-Export" not in bpy.data.collections:
+            print("Creating missing collection")
+            bpy.data.collections.new("VRM-Export") # Create Collection
+            bpy.data.collections["VRM-Export"].color_tag = "COLOR_07"
+            bpy.context.scene.collection.children.link(bpy.data.collections["VRM-Export"]) # Link new Collection to Scene
+
+        print("Moving Duplicates to VRM-Export Collection")
+        for obj in context.selected_objects:
+            obj.name = re.sub( blender_copy_re, "-VRM", obj.name)
+            for collection in obj.users_collection:
+                collection.objects.unlink(obj)
+            bpy.data.collections["VRM-Export"].objects.link(obj) # Add to T-Pose-Bound collection
+        
+        newArmature = skeleton_util.find_armature(context.selected_objects)
+
+        newArmature.location.x = 0
+        newArmature.location.z = 0
+        newArmature.location.y = 0
+        #TODO: Move this out
+        print("Zeroing 3DCursor")
+        bpy.context.scene.cursor.location[0] = 0.0
+        bpy.context.scene.cursor.location[1] = 0.0
+        bpy.context.scene.cursor.location[2] = 0.0
+
+        print("Selecting The new duplicates")
+        
+        for child in newArmature.children:
+            child.select_set(True)
+        newArmature.select_set(True)
+
+        print("Centering all duplicates to region zero, and applying transforms")
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+
+    
+        print("Posing to VRM Reference.")
+        skeleton_util.pose_to_vrm_reference(context, [newArmature])
+        
+        bpy.ops.object.mode_set(mode="OBJECT")
+
+        skeleton_util.apply_armature_restpose(context, newArmature)
+
         return {'FINISHED'}
 
     
@@ -174,6 +232,9 @@ class ARMATURE_OT_VRM_EXTRA_Clear_SpringBoneColliders(bpy.types.Operator):
     def execute(self, context):
         secondary_animation = context.active_object.data.vrm_addon_extension.vrm0.secondary_animation
         for bone in secondary_animation.collider_groups:
+            for collider in bone.colliders:
+                bpy.ops.vrm.remove_vrm0_secondary_animation_collider_group_collider(armature_name=context.active_object.name, collider_group_index=0, collider_index=0)
+            
             bpy.ops.vrm.remove_vrm0_secondary_animation_collider_group(armature_name=context.active_object.name, collider_group_index=0)
 
         return {'FINISHED'}
@@ -194,7 +255,7 @@ class ARMATURE_OT_VRM_EXTRA_Clear_SpringBones(bpy.types.Operator):
     def execute(self, context):
         secondary_animation = context.active_object.data.vrm_addon_extension.vrm0.secondary_animation
         for bone in secondary_animation.bone_groups:
-            bpy.ops.vrm.remove_vrm0_secondary_animation_group(armature_name=context.active_object.name, bone_group_index=0)
+           bpy.ops.vrm.remove_vrm0_secondary_animation_group(armature_name=context.active_object.name, bone_group_index=0)
 
         return {'FINISHED'}
 
@@ -221,7 +282,7 @@ class ARMATURE_PT_VRM_ARMATURE_EXTENDED_TOOLSET(bpy.types.Panel):
 
         layout.operator(ARMATURE_OT_VRM_EXTRA_Create_Armature.bl_idname,  icon='ARMATURE_DATA')
         layout.operator(ARMATURE_OT_VRM_EXTRA_Set_Pose_Operator.bl_idname,  icon='OUTLINER_OB_ARMATURE')
-        layout.operator(ARMATURE_OT_VRM_EXTRA_Create_T_Pose_Operator.bl_idname,  icon='OUTLINER_OB_ARMATURE')
+        layout.operator(ARMATURE_OT_VRM_EXTRA_Bind_T_Pose_Operator.bl_idname,  icon='OUTLINER_OB_ARMATURE')
 
         return None 
     
@@ -254,7 +315,7 @@ class ARMATURE_PT_VRM_ARMATURE_SPRINGBONES_EXTENDED_TOOLSET(bpy.types.Panel):
 classes = (
     ARMATURE_OT_VRM_EXTRA_Create_Armature,
     ARMATURE_OT_VRM_EXTRA_Set_Pose_Operator,
-    ARMATURE_OT_VRM_EXTRA_Create_T_Pose_Operator,
+    ARMATURE_OT_VRM_EXTRA_Bind_T_Pose_Operator,
     ARMATURE_PT_VRM_ARMATURE_EXTENDED_TOOLSET,
     ARMATURE_OT_VRM_EXTRA_Bind_As_SpringBone_Group,
     ARMATURE_OT_VRM_EXTRA_Clear_SpringBones,

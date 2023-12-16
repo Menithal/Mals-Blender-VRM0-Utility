@@ -1,8 +1,10 @@
 
 import bpy
+import re 
 from mathutils import Matrix, Vector
 from .vrm_skeleton import skeleton as vrm_skeleton, index_bindings
-
+from io_extended_scene_vrm.ext.przemir.apply_modifier_for_object_with_shapekeys.ApplyModifierForObjectWithShapeKeys import applyModifierForObjectWithShapeKeys
+from io_extended_scene_vrm.utility import blender_copy_re
 
 def find_armature(selection):
     for selected in selection:
@@ -74,14 +76,14 @@ def get_current_vrm_bindings(selected):
     
     return vrm_binding
 
-def pose_to_vrm_reference(selected: list[bpy.types.Object]) -> None:
+def pose_to_vrm_reference(context, selected: list[bpy.types.Object]) -> None:
     armature = find_armature(selected)
+    context.view_layer.objects.active = armature
     if armature is not None:
         current_vrm_bindings = get_current_vrm_bindings(armature)
         # Center Children First
-        bpy.context.view_layer.objects.active = armature
         armature.select_set(state=True)
-        bpy.context.object.data.pose_position = 'POSE'
+        context.object.data.pose_position = 'POSE'
 
         bpy.ops.object.mode_set(mode="OBJECT")
         # Make sure to reset the bones first.
@@ -166,3 +168,55 @@ def build_skeleton():
 
     finally:
         bpy.context.area.type = current_view
+
+
+
+def apply_armature_restpose(context, armature):
+   
+    if armature.type != "ARMATURE":  
+        print("Armature was not found")
+        return
+
+    try:
+        bpy.ops.wm.console_toggle()
+    except:
+        print("Console was toggled")
+
+    for selected_child in armature.children:
+        modifiers = selected_child.modifiers
+        # Find Modifier that is the Armature
+        print("Trying to find Armature modifier in Child " + selected_child.name)
+        armature_modifiers = [modifier for modifier in modifiers if modifier.type == "ARMATURE"]
+        if len(armature_modifiers) == 0:
+            print("Could not find armature modifier for " + selected_child.name + ". Applying Modifier Automatically without ")
+        
+        
+        bpy.context.view_layer.objects.active = selected_child
+        
+        armature_modifier = armature_modifiers[0]
+        legacy_modifier = re.sub( blender_copy_re, "", armature_modifier.name)
+        print("Modifier found, name is "  + legacy_modifier)
+        bpy.ops.object.modifier_copy(modifier=armature_modifier.name)
+        print("Current modifier stack is ", selected_child.modifiers)
+            
+        selected_child.select_set(True) 
+        success, errorInfo = applyModifierForObjectWithShapeKeys(context, [legacy_modifier], False)
+        if success:
+            print("Renaming Duplicate Modifier to \"" + legacy_modifier+ " T posed\"")
+            selected_child.modifiers[legacy_modifier+".001"].name = legacy_modifier + " T posed"
+            selected_child.select_set(False)
+            print("Succesfully merged",legacy_modifier, "modifier in " + selected_child.name)
+            continue
+
+        bpy.context.view_layer.objects.active = armature
+        print("Could not merge modifier for " + selected_child.name + " - Skipping")
+        return
+    
+    try:
+        bpy.ops.wm.console_toggle()
+    except:
+        print("Console was toggled")
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode="POSE")
+
+    bpy.ops.pose.armature_apply()
