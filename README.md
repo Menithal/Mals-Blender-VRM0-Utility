@@ -10,6 +10,8 @@ Comes with an button to spawn an reference VRM Armature, modified to work with V
 
 # Dependencies
 
+- Blender 3.3 or Later. (Tested on Blender 4.0 and 3.6... 3.3 has not been tested.)
+
 - [VRM Addon for Blender](https://vrm-addon-for-blender.info/en/)
 
 - (Built-In) [Przemir's ApplyModifierForObjectWithShapeKeys](https://github.com/przemir/ApplyModifierForObjectWithShapeKeys) dependency to address retargeting to armature
@@ -49,7 +51,7 @@ Supported shapekey sets:
 - **Bind MMD Shapekeys** - Generates Shapekeys ONLY if they exist in the mesh, as accoriding to a list of existing MMD terms.
 - **Clear All Blendshape Proxy Binds** - Clears <ins>ALL</ins> Blendshape Proxy Binds . Handy when doing everything from scratch.
 
-## VRM0x Springbone Extra Tools
+### VRM0x Springbone Extra Tools
 
 _Left Hand Panel_ that only appear while in `POSE_ARMATURE` or `EDIT_ARMATURE` modes.
 
@@ -75,10 +77,12 @@ If you think my stuff is neat, feel free to check my other work at my [ko-fi at 
 
 
 # Change Log
+### Version 0.0.4
+- Spring Bone Colliders now bind onto existing Spring bones (when created)
+- Adjusted scale of Sprinbone colliders
 
 ### Version 0.0.2
-- Fixed Issues with Thumbs matching a misunderstood VRM reference. Thumbs now correct use the 45 X-Z Rule.
+- Fixed Issues with Thumbs matching a misunderstood VRM reference. Thumbs now correctly use the 45 degree X-Z Rule.
 
 ### Version 0.0.1
-
 - Initial Version with majority of the features

@@ -9,3 +9,4 @@ def operator_exists(idname):
         return True
     except:
         return False
+ 

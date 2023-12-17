@@ -23,7 +23,7 @@ bl_info = {
     "name": "Mals' Extended VRM",
     "author": " 'Menithal' ", 
     "version": (0, 0, 4),
-    "blender": (3, 0, 0),
+    "blender": (3, 3, 0),
     "location": "3D View Tools",
     "description": "Additional VRM Tools",
     "warning": "",

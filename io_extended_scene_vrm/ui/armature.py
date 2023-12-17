@@ -187,7 +187,7 @@ class ARMATURE_OT_VRM_EXTRA_Bind_As_SpringBone_Group(bpy.types.Operator):
 
         # Same Default as UniVRM
         selected_bone_group.gravity_dir[2] = -1
-        selected_bone_group.hit_radius = 0.2
+        selected_bone_group.hit_radius = 0.04
         selected_bone_group.stiffiness = 1
         selected_bone_group.drag_force = 0.4
 
@@ -212,20 +212,27 @@ class ARMATURE_OT_VRM_EXTRA_Bind_As_SpringBoneCollider_Group(bpy.types.Operator)
     bl_space_type = "VIEW_3D"
 
     def execute(self, context):
-
-        secondary_animation = context.active_object.data.vrm_addon_extension.vrm0.secondary_animation
+        armature = skeleton_util.find_armature(context.selected_objects) 
+        secondary_animation = armature.data.vrm_addon_extension.vrm0.secondary_animation
         current_length = len(secondary_animation.collider_groups)
         
         uBones = context.selected_pose_bones or context.selected_bones
         for bone in uBones:
-            bpy.ops.vrm.add_vrm0_secondary_animation_collider_group(armature_name=context.active_object.name)
+            bpy.ops.vrm.add_vrm0_secondary_animation_collider_group(armature_name=armature.name)
             secondary_animation.collider_groups[current_length].node.bone_name = bone.name
-            bpy.ops.vrm.add_vrm0_secondary_animation_collider_group_collider(armature_name=context.active_object.name, 
+            secondary_animation.collider_groups[current_length].node.bone_name = bone.name
+            bpy.ops.vrm.add_vrm0_secondary_animation_collider_group_collider(armature_name=armature.name, 
                                                                              collider_group_index=current_length, bone_name=bone.name)
+            secondary_animation.collider_groups[current_length].colliders[0]['bpy_object'].empty_display_size = 0.02
+
             current_length = current_length + 1
 
-      # # for colliders in secondary_animation.collider_groups:
-  #         for springbones in secondary_animation.
+        for collider in secondary_animation.collider_groups:
+            for ind,springbones in enumerate(secondary_animation.bone_groups):
+                existing_colliders = springbones.collider_groups.keys()
+                if collider.name not in existing_colliders:
+                    bpy.ops.vrm.add_vrm0_secondary_animation_group_collider_group(armature_name=armature.name, bone_group_index=ind)
+                    springbones.collider_groups[len(existing_colliders)].value = collider.name
         
         return {'FINISHED'}
 
