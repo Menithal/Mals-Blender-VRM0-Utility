@@ -22,7 +22,7 @@ from .ui import armature, shapekeys
 bl_info = {
     "name": "Mals' Extended VRM",
     "author": " 'Menithal' ", 
-    "version": (0, 0, 3),
+    "version": (0, 0, 4),
     "blender": (3, 0, 0),
     "location": "3D View Tools",
     "description": "Additional VRM Tools",
