@@ -14,8 +14,8 @@ def find_armature(selection):
             return selected.parent
     return None
 
-def pose_armature(armature,current_bindings, data, current_rest_node, world_matrix, parent, parent_node):
-    name = current_rest_node["name"]
+def pose_armature(armature,current_bindings, data, current_reference_bone, world_matrix, parent, parent_node):
+    name = current_reference_bone["name"]
 
     # refere to the bindings dictionary, get index to use in indexbindings when match with reference skeleton
     reference_name = None
@@ -26,12 +26,13 @@ def pose_armature(armature,current_bindings, data, current_rest_node, world_matr
         return
     
     bone = data.get(reference_name)
-    if(bone):
+    
+    if bone is not None:
         armature.data.bones[bone.name].select = True
         legacy_rotation = bone.rotation_mode
         bone.rotation_mode = "QUATERNION"
-        # bpy.ops.action.keyframe_insert()
-        destination_matrix = current_rest_node["matrix_local"].copy()
+
+        destination_matrix = current_reference_bone["matrix_local"].copy()
         inv_destination_matrix = destination_matrix.inverted()
         matrix = bone.matrix
         if parent:
@@ -56,13 +57,15 @@ def pose_armature(armature,current_bindings, data, current_rest_node, world_matr
             bpy.ops.anim.keyframe_insert_by_name(type="Rotation")
 
         armature.data.bones[bone.name].select = False
-        for child in current_rest_node["children"]:
+        for child in current_reference_bone["children"]:
             pose_armature(armature,current_bindings, data, child, world_matrix,
-                              bone, current_rest_node)
+                              bone, current_reference_bone)
     else:
-        bone = parent
-        for child in current_rest_node["children"]:
-            pose_armature(armature,data, child, world_matrix, bone, parent_node)
+        print("Couldnt find reference binding, skipping VRM Bone", name)
+        bone = parent.child
+
+        for child in current_reference_bone["children"]:
+            pose_armature(armature, current_bindings, data, child, world_matrix, bone, parent_node)
 
 def get_current_vrm_bindings(selected):
     vrm_binding = dict()
@@ -92,7 +95,7 @@ def pose_to_vrm_reference(context, selected: list[bpy.types.Object]) -> None:
 
         bpy.ops.object.mode_set(mode="POSE")
         bpy.ops.pose.select_all(action="SELECT")
-        bpy.ops.pose.transforms_clear()
+        bpy.ops.pose.rot_clear()
         bpy.ops.pose.select_all(action="DESELECT")
 
         world_matrix = armature.matrix_world
@@ -157,11 +160,7 @@ def build_skeleton():
         for root_bone in vrm_skeleton:
             build_armature_structure(current_armature.data, root_bone, None)
 
-        current_armature.scale = Vector((100.0, 100.0, 100.0))
         bpy.ops.object.mode_set(mode="OBJECT")
-        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-        
-
         
     except Exception as detail:
         print("Error", detail)
@@ -189,7 +188,7 @@ def apply_armature_restpose(context, armature):
         armature_modifiers = [modifier for modifier in modifiers if modifier.type == "ARMATURE"]
         if len(armature_modifiers) == 0:
             print("Could not find armature modifier for " + selected_child.name + ". Applying Modifier Automatically without ")
-        
+            continue
         
         bpy.context.view_layer.objects.active = selected_child
         
@@ -200,7 +199,7 @@ def apply_armature_restpose(context, armature):
         print("Current modifier stack is ", selected_child.modifiers)
             
         selected_child.select_set(True) 
-        success, errorInfo = applyModifierForObjectWithShapeKeys(context, [legacy_modifier], False)
+        success, errorInfo = applyModifierForObjectWithShapeKeys(context, [legacy_modifier], True)
         if success:
             print("Renaming Duplicate Modifier to \"" + legacy_modifier+ " T posed\"")
             selected_child.modifiers[legacy_modifier+".001"].name = legacy_modifier + " T posed"

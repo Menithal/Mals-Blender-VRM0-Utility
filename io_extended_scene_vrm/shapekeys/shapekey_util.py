@@ -54,6 +54,7 @@ def bind_shapekeys_to_vrm_blendshape_proxy(armature: bpy.types.Object, target_sh
     available_mesh_children: list[bpy.types.Mesh] = []
     # Iterate through all the child objects (that are visible) on the armature, and complete binding)
     for child in armature.children:
+       if child.name not in bpy.context.view_layer.objects.keys(): continue
        if child.type != "MESH": continue
        
        if child.data.shape_keys is None: continue

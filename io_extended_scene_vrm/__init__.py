@@ -17,16 +17,14 @@
 # ##### END GPL LICENSE BLOCK #####
 # Copyright 2023 Matti 'Menithal' Lahtinen
 import bpy
-from .ext.przemir.apply_modifier_for_object_with_shapekeys.ApplyModifierForObjectWithShapeKeys import ApplyModifierForObjectWithShapeKeysOperator
-from .utility import blender_copy_re, operator_exists
 from .ui import armature, shapekeys
 
 bl_info = {
     "name": "Mals' Extended VRM",
     "author": " 'Menithal' ", 
-    "version": (0, 0, 1 ),
+    "version": (0, 0, 2),
     "blender": (3, 0, 0),
-    "location": "Pose Mode",
+    "location": "3D View Tools",
     "description": "Additional VRM Tools",
     "warning": "",
     "wiki_url": "",
@@ -34,23 +32,11 @@ bl_info = {
     "category": "Addon Extension",
 }
 
-# classes = () 
-
-# module_register, module_unregister = bpy.utils.register_classes_factory(classes)    
-
-
 def register():
-#   module_register()
-    
-    existing_shapekey_merger = operator_exists(ApplyModifierForObjectWithShapeKeysOperator.bl_idname)
     armature.module_register()
     shapekeys.module_register()
 
 
 def unregister():
-#   module_unregister()
-    
-    existing_shapekey_merger = operator_exists(ApplyModifierForObjectWithShapeKeysOperator.bl_idname)
-  
     armature.module_unregister()
     shapekeys.module_unregister()

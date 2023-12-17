@@ -139,28 +139,6 @@ class SHAPE_PT_VRM_EXTENDED_BLENDSHAPE_PROXY_TOOLSET(bpy.types.Panel):
         return None 
     
 
-class SHAPE_PT_VRM_EXTENDED_REMINDER_TOOLSET(bpy.types.Panel):
-    """ Panel for Shapekey related tools """
-    bl_label = "VRM 0.x Extra Tools"
-    bl_icon = "OBJECT_DATA"
-    bl_space_type = "VIEW_3D"  
-    bl_region_type = "UI"
-    bl_category = category
-
-    @classmethod
-    def poll(self, context):
-        contextIsObject = (context.mode == "OBJECT" or context.mode == "POSE")
-        selectedHasArmatureParent = skeleton_util.find_armature(context.selected_objects) is not None or (context.active_object is not None and context.active_object.type == "ARMATURE")
-        activeIsVrm = context.active_object is not None and ("vrm_addon_extension" in context.active_object.data and 
-                                                             "vrm0" in context.active_object.data.vrm_addon_extension)
-        return contextIsObject and not (selectedHasArmatureParent and activeIsVrm)
-
-    def draw(self, context):
-        layout = self.layout
-        layout.label(text="Select a VRM 0.x Armature on the scene to access extra tools")
-        
-        return None 
-
 classes = (
    SHAPE_PT_VRM_EXTENDED_BLENDSHAPE_PROXY_TOOLSET,
    SHAPE_OT_VRM_EXTRA_Add_VRM_Shapekey,
@@ -170,7 +148,6 @@ classes = (
    SHAPE_OT_VRM_EXTRA_Add_Meta_Shapekeys,
    SHAPE_OT_VRM_EXTRA_Add_HTC_Shapekeys,
    SHAPE_OT_VRM_EXTRA_Add_MMD_Shapekeys,
-   SHAPE_PT_VRM_EXTENDED_REMINDER_TOOLSET,
 
 )
 
