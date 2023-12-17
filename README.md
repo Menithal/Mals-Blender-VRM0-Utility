@@ -90,12 +90,15 @@ If you think my stuff is neat, feel free to check my other work at my [ko-fi at 
 
 
 # Change Log
+### Version 0.0.5
+- Fixed more misunderstood reference issues with thumbs related to coordinates being different. Now Matches VRM Addon's reference.
+
 ### Version 0.0.4
 - Spring Bone Colliders now bind onto existing Spring bones (when created)
 - Adjusted scale of Sprinbone colliders
 
 ### Version 0.0.2
-- Fixed Issues with Thumbs matching a misunderstood VRM reference. Thumbs now correctly use the 45 degree X-Z Rule.
+- Fixed Issues with Thumbs matching a misunderstood VRM reference. Thumbs now use the 45 degree X + 45 degree Z Rule.
 
 ### Version 0.0.1
 - Initial Version with majority of the features
