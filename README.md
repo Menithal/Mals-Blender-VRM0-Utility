@@ -8,6 +8,7 @@ This set of tools allows you streamline both binding of Shapekeys into blendshap
 
 Comes with an button to spawn an reference VRM Armature, modified to work with VSeeFace
 
+
 # Dependencies
 
 - Blender 3.3 or Later. (Tested on Blender 4.0 and 3.6... 3.3 has not been tested.)
@@ -16,7 +17,19 @@ Comes with an button to spawn an reference VRM Armature, modified to work with V
 
 - (Built-In) [Przemir's ApplyModifierForObjectWithShapeKeys](https://github.com/przemir/ApplyModifierForObjectWithShapeKeys) dependency to address retargeting to armature
 
+# Installing
+
+Open the Github page, Go to releases and download the `io_extended_scene_vrm_#.#.#.zip` zip file. 
+
+In Blender. Goto `User Preferences`, and `Add-ons`. From there `Install Add-on from File` and select the Zip file that we downloaded.
+
+Enable the plugin under `Addon Extension: Mal's Extended VRM`.
+
+
 # Tools
+
+[Youtube Demonstration](https://www.youtube.com/watch?v=qkvUbljGmYA)
+
 
 The Addon adds a new Toolshelf on the Right hand side of the 3D view `VRM0 MalAv Tools`. 
 Additional Context sensative tool Panels appear on the Left when editing the Pose of Armature, or editing bones.
