@@ -57,3 +57,28 @@ _Left Hand Panel_ that only appear while in `POSE_ARMATURE` or `EDIT_ARMATURE` m
 - **Add Selected as Colliders** - Adds all the selected bones as <ins>Individual Colliders</ins>. Adds Colliders to Springbone groups.
 - **Clear Springbone Groups** -  Clears ALL the springbone groups 
 - **Clear Springbone Collider Groups** -  Clears ALL the Colliders 
+
+
+# Developing / Contributing
+
+Make sure to use `git submodule init` and `git submodule update` as we are using an external add on to bind shapekeys to new model.
+
+Copy `io_extended_scene_vrm` folder to your Blender Addons Directory. 
+
+On Windows this is under `%APPDATA%/Blender Foundation/Blender/<BlenderVersion>/addons`
+
+If you are using VSCode, I  HIGHLY suggest using **Jacques Lucke's Blender Development Addon** (`JacquesLucke.blender-development`), which allows you to build, redeploy and debug blender add ons directly from the VSCode Workspace.
+
+# Donations
+
+If you think my stuff is neat, feel free to check my other work at my [ko-fi at malactus](https://ko-fi.com/malactus) and maybe buy me a coffee, or two.
+
+
+# Change Log
+
+### Version 0.0.2
+- Fixed Issues with Thumbs matching a misunderstood VRM reference. Thumbs now correct use the 45 X-Z Rule.
+
+### Version 0.0.1
+
+- Initial Version with majority of the features
