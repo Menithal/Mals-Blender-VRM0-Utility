@@ -22,12 +22,12 @@ from .ui import armature, shapekeys
 bl_info = {
     "name": "Mals' Extended VRM",
     "author": "Matti 'Menithal' Lahtinen", 
-    "version": (0, 0, 5),
+    "version": (0, 0, 9),
     "blender": (3, 3, 0),
     "location": "3D View Tools",
     "description": "Additional VRM Tools",
     "warning": "",
-    "wiki_url": "",
+    "wiki_url": "", 
     "support": "COMMUNITY",
     "category": "Addon Extension",
 }

@@ -58,6 +58,7 @@ When VRM Armature is selected:
 Supported shapekey sets:
     - VRM
     - VSeeFace extended
+    - VRC -> VSF
     - ARKit (iPhone Face Tracking)
     - Meta (Quest Pro Face Tracking)
     - HTC Face Tracking

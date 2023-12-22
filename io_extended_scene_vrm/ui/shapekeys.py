@@ -6,6 +6,7 @@ from io_extended_scene_vrm.shapekeys.references.arkit import arkit_shapekeys
 from io_extended_scene_vrm.shapekeys.references.meta import meta_shapekeys
 from io_extended_scene_vrm.shapekeys.references.htc import htc_shapekeys
 from io_extended_scene_vrm.shapekeys.references.vrm import vrm_shapekeys
+from io_extended_scene_vrm.shapekeys.references.vrc import vsf_vrc_bindings
 from io_extended_scene_vrm.shapekeys.references.mmd import mmd_shapekeys
 from io_extended_scene_vrm.skeleton import skeleton_util
 
@@ -52,6 +53,22 @@ class SHAPE_OT_VRM_EXTRA_Add_VSF_Shapekey(bpy.types.Operator):
     def execute(self, context):
         shapekey_util.bind_shapekeys_to_vrm_blendshape_proxy(context.active_object, vsf_shapekeys, False)
         return {'FINISHED'}
+    
+    
+class SHAPE_OT_VRM_EXTRA_Add_VRC_to_VSF_Shapekey(bpy.types.Operator):
+    """Generate and Bind all the VCR Shapekeys found related to VSF + VRM  """
+    bl_idname = "io_extended_scene_vrm.bind_vrc_vsf_shape_keys"
+    bl_label = "Generate VSF Shapekeys out of VRC"
+
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = category
+    bl_space_type = "VIEW_3D"
+
+    def execute(self, context):
+        shapekey_util.bind_shapekeys_to_vrm_blendshape_proxy(context.active_object, vsf_shapekeys, False, vsf_vrc_bindings)
+        return {'FINISHED'}
+    
     
 class SHAPE_OT_VRM_EXTRA_Add_Arkit_Shapekeys(bpy.types.Operator):
     """ Generate and Bind all the Shapekeys found related to Arkit Facetracking  """
@@ -130,6 +147,7 @@ class SHAPE_PT_VRM_EXTENDED_BLENDSHAPE_PROXY_TOOLSET(bpy.types.Panel):
         layout = self.layout
         layout.operator(SHAPE_OT_VRM_EXTRA_Add_VRM_Shapekey.bl_idname, icon="SHAPEKEY_DATA")
         layout.operator(SHAPE_OT_VRM_EXTRA_Add_VSF_Shapekey.bl_idname, icon="SHAPEKEY_DATA")
+        layout.operator(SHAPE_OT_VRM_EXTRA_Add_VRC_to_VSF_Shapekey.bl_idname, icon="SHAPEKEY_DATA")
         layout.operator(SHAPE_OT_VRM_EXTRA_Add_Arkit_Shapekeys.bl_idname, icon="SHAPEKEY_DATA")
         layout.operator(SHAPE_OT_VRM_EXTRA_Add_Meta_Shapekeys.bl_idname, icon="SHAPEKEY_DATA")
         layout.operator(SHAPE_OT_VRM_EXTRA_Add_HTC_Shapekeys.bl_idname, icon="SHAPEKEY_DATA")
@@ -145,6 +163,7 @@ classes = (
    SHAPE_OT_VRM_EXTRA_Clear_All_Proxy_Shapekeys,
    SHAPE_OT_VRM_EXTRA_Add_Arkit_Shapekeys,
    SHAPE_OT_VRM_EXTRA_Add_VSF_Shapekey,
+   SHAPE_OT_VRM_EXTRA_Add_VRC_to_VSF_Shapekey,
    SHAPE_OT_VRM_EXTRA_Add_Meta_Shapekeys,
    SHAPE_OT_VRM_EXTRA_Add_HTC_Shapekeys,
    SHAPE_OT_VRM_EXTRA_Add_MMD_Shapekeys,
