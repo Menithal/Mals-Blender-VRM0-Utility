@@ -31,7 +31,6 @@ def bind_shapekeys_to_proxy(armature: bpy.types.Object,
         is_retargetable = retarget is not None and shapekey.lower() in retarget_keys
         if is_retargetable:
             retarget_value = retarget.get(shapekey)
-            print("Found retargetable ", retarget_value, "for", shapekey)
             if has_shapekey_in_mesh(retarget_value, mesh):
                 # use original blendshapegroup
                 blend_shape_group_index = blendshape_groups.index(shapekey.lower())
@@ -88,7 +87,7 @@ def bind_shapekeys_to_vrm_blendshape_proxy(armature: bpy.types.Object, target_sh
           if shape_key in available_shapekey_list: continue    
           available_shapekey_list.append(shape_key.name.lower())
 
-    existing_keys = [item for item in armature.data.vrm_addon_extension.vrm0.blend_shape_master.blend_shape_groups.keys()]
+    existing_keys = [item.lower() for item in armature.data.vrm_addon_extension.vrm0.blend_shape_master.blend_shape_groups.keys()]
     skipped = 0
     
     for i,target_shapekey in enumerate(target_shapekey_list):  
