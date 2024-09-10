@@ -19,7 +19,7 @@
 import bpy
 from .ui import armature, shapekeys
 
-bl_info = {
+bl_info = { 
     "name": "Mals' Extended VRM",
     "author": "Matti 'Menithal' Lahtinen", 
     "version": (0, 0, 10),

@@ -93,6 +93,7 @@ def bind_shapekeys_to_vrm_blendshape_proxy(armature: bpy.types.Object, target_sh
     for i,target_shapekey in enumerate(target_shapekey_list):  
         if (bind_existing and target_shapekey.lower() in available_shapekey_list) or not bind_existing:
             if target_shapekey.lower() not in existing_keys:
+                print(target_shapekey)
                 bpy.ops.vrm.add_vrm0_blend_shape_group(armature_name=armature.name, name=target_shapekey)
 
             group = armature.data.vrm_addon_extension.vrm0.blend_shape_master.blend_shape_groups[target_shapekey]

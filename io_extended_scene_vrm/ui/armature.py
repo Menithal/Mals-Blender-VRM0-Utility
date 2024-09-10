@@ -282,6 +282,7 @@ class ARMATURE_OT_VRM_EXTRA_Clear_SpringBones(bpy.types.Operator):
 
 class ARMATURE_PT_VRM_ARMATURE_EXTENDED_TOOLSET(bpy.types.Panel):
     """ Panel for VRMArmature related tools """
+    
     bl_label = "VRM 0.x Armature Extra Tools"
     bl_icon = "OBJECT_DATA"
     bl_space_type = "VIEW_3D" 
@@ -290,10 +291,14 @@ class ARMATURE_PT_VRM_ARMATURE_EXTENDED_TOOLSET(bpy.types.Panel):
 
     @classmethod
     def poll(self, context):
+        if context.active_object is None:
+            return False
+        
         contextIsObject = (context.mode == "OBJECT" or context.mode == "POSE" or context.mode == "EDIT_ARMATURE")
         selectedHasArmatureParent = skeleton_util.find_armature(context.selected_objects) is not None or (context.active_object is not None and context.active_object.type == "ARMATURE")
         activeIsVrm = context.active_object is not None and ("vrm_addon_extension" in context.active_object.data and 
                                                              "vrm0" in context.active_object.data.vrm_addon_extension)
+
         return contextIsObject and selectedHasArmatureParent and activeIsVrm
 
     def draw(self, context):
@@ -314,10 +319,14 @@ class ARMATURE_PT_VRM_ARMATURE_SPRINGBONES_EXTENDED_TOOLSET(bpy.types.Panel):
 
     @classmethod
     def poll(self, context):
+        if context.active_object is None:
+            return False
+        
         contextIsObject = (context.mode == "POSE" or context.mode == "EDIT_ARMATURE")
         selectedHasArmatureParent = skeleton_util.find_armature(context.selected_objects) is not None or (context.active_object is not None and context.active_object.type == "ARMATURE")
         activeIsVrm = context.active_object is not None and ("vrm_addon_extension" in context.active_object.data and 
                                                              "vrm0" in context.active_object.data.vrm_addon_extension)
+
         return contextIsObject and selectedHasArmatureParent and activeIsVrm
 
     def draw(self, context):
