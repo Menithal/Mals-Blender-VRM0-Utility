@@ -14,7 +14,7 @@ def find_armature(selection):
             return selected.parent
     return None
 
-def pose_armature(armature,current_bindings, data, current_reference_bone, world_matrix, parent, parent_node):
+def pose_armature(armature, current_bindings, data, current_reference_bone, world_matrix, parent, parent_node):
     name = current_reference_bone["name"]
 
     # refere to the bindings dictionary, get index to use in indexbindings when match with reference skeleton
@@ -61,6 +61,10 @@ def pose_armature(armature,current_bindings, data, current_reference_bone, world
             pose_armature(armature,current_bindings, data, child, world_matrix,
                               bone, current_reference_bone)
     else:
+        if parent is None:
+            print("Skipping, No Parent available")
+            return
+
         print("Couldnt find reference binding, skipping VRM Bone", name)
         bone = parent.child
 
