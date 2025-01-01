@@ -1,4 +1,4 @@
-vsf_vrc_bindings: dict ={
+vsf_vrc_legacy_bindings: dict ={
  "A": "vrc.v_aa",
  "CH": "vrc.v_ch",
  "DD": "vrc.v_dd",
@@ -14,4 +14,22 @@ vsf_vrc_bindings: dict ={
  "SS": "vrc.v_ss",
  "TH": "vrc.v_th",
  "U": "vrc.v_ou"
+}
+
+vsf_vrc_bindings: dict ={
+ "A": "vrc.aa",
+ "CH": "vrc.ch",
+ "DD": "vrc.dd",
+ "E": "vrc.e",
+ "FF": "vrc.ff",
+ "I": "vrc.ih",
+ "KK": "vrc.kk",
+ "O" : "vrc.oh",
+ "PP": "vrc.pp",
+ "NN": "vrc.nn",
+ "RR": "vrc.rr",
+ "SIL": "vrc.sil",
+ "SS": "vrc.ss",
+ "TH": "vrc.th",
+ "U": "vrc.ou"
 }

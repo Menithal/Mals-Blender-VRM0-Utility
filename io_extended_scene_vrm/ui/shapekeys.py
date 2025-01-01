@@ -6,6 +6,7 @@ from io_extended_scene_vrm.shapekeys.references.arkit import arkit_shapekeys
 from io_extended_scene_vrm.shapekeys.references.meta import meta_shapekeys
 from io_extended_scene_vrm.shapekeys.references.htc import htc_shapekeys
 from io_extended_scene_vrm.shapekeys.references.vrm import vrm_shapekeys
+from io_extended_scene_vrm.shapekeys.references.vrc import vsf_vrc_legacy_bindings
 from io_extended_scene_vrm.shapekeys.references.vrc import vsf_vrc_bindings
 from io_extended_scene_vrm.shapekeys.references.mmd import mmd_shapekeys
 from io_extended_scene_vrm.skeleton import skeleton_util
@@ -66,6 +67,7 @@ class SHAPE_OT_VRM_EXTRA_Add_VRC_to_VSF_Shapekey(bpy.types.Operator):
     bl_space_type = "VIEW_3D"
 
     def execute(self, context):
+        shapekey_util.bind_shapekeys_to_vrm_blendshape_proxy(context.active_object, vsf_shapekeys, False, vsf_vrc_legacy_bindings)
         shapekey_util.bind_shapekeys_to_vrm_blendshape_proxy(context.active_object, vsf_shapekeys, False, vsf_vrc_bindings)
         return {'FINISHED'}
     
