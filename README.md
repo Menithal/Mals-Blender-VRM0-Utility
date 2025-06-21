@@ -91,6 +91,21 @@ If you think my stuff is neat, feel free to check my other work at my [ko-fi at 
 
 
 # Change Log
+
+### Version 0.0.12
+- fix(shapekeys): Added alternative names to vrc to vrm/vsf bindings
+- fix(bones): Fixed Issue with Missing bones causing errors
+- fix(general): Made sure errors are not populated if incorrect object is selected
+
+### Version 0.0.10
+- fix(shapekeys): Make sure duplicate Blendshapes are getting filtered out.
+
+### Version 0.0.9
+
+- feature(shapekeys): uses camelcase for Arkit names
+- fix(shapekeys): case sensativity works correctly now
+- feature(shapekeys): Added new binding methods for vrc->vsf
+
 ### Version 0.0.5
 - Fixed more misunderstood reference issues with thumbs related to coordinates being different. Now Matches VRM Addon's reference.
 
