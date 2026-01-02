@@ -28,7 +28,7 @@ def pose_armature(armature, current_bindings, data, current_reference_bone, worl
     bone = data.get(reference_name)
     
     if bone is not None:
-        armature.data.bones[bone.name].select = True
+        armature.pose.bones[bone.name].select = True
         legacy_rotation = bone.rotation_mode
         bone.rotation_mode = "QUATERNION"
 
@@ -56,7 +56,7 @@ def pose_armature(armature, current_bindings, data, current_reference_bone, worl
         if(bpy.context.scene.tool_settings.use_keyframe_insert_auto):
             bpy.ops.anim.keyframe_insert_by_name(type="Rotation")
 
-        armature.data.bones[bone.name].select = False
+        armature.pose.bones[bone.name].select = False
         for child in current_reference_bone["children"]:
             pose_armature(armature,current_bindings, data, child, world_matrix,
                               bone, current_reference_bone)
