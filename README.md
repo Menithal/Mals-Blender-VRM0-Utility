@@ -11,7 +11,7 @@ Comes with an button to spawn an reference VRM Armature, modified to work with V
 
 # Dependencies
 
-- Blender 3.3 or Later. (Tested on Blender 4.0 and 3.6... 3.3 has not been tested.)
+- Blender 5 or Later. Blender 5 had some breaking changes. If using Blender 3-4, use version 0.12 instead.
 
 - [VRM Addon for Blender](https://vrm-addon-for-blender.info/en/)
 
