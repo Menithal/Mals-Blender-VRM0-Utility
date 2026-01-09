@@ -92,6 +92,9 @@ If you think my stuff is neat, feel free to check my other work at my [ko-fi at 
 
 # Change Log
 
+### Version 0.0.13
+- fix(general): Blender 5.x compatability fixes
+
 ### Version 0.0.12
 - fix(shapekeys): Added alternative names to vrc to vrm/vsf bindings
 - fix(bones): Fixed Issue with Missing bones causing errors
