@@ -10,6 +10,7 @@ from io_extended_scene_vrm.shapekeys.references.vrc import vsf_vrc_legacy_bindin
 from io_extended_scene_vrm.shapekeys.references.vrc import vsf_vrc_bindings
 from io_extended_scene_vrm.shapekeys.references.mmd import mmd_shapekeys
 from io_extended_scene_vrm.skeleton import skeleton_util
+from io_extended_scene_vrm.utility import is_vrm0
 
 category = "VRM0 MalAv Tools"
 class SHAPE_OT_VRM_EXTRA_Clear_All_Proxy_Shapekeys(bpy.types.Operator):
@@ -141,9 +142,7 @@ class SHAPE_PT_VRM_EXTENDED_BLENDSHAPE_PROXY_TOOLSET(bpy.types.Panel):
     def poll(self, context):
         contextIsObject = (context.mode == "OBJECT")
         selectedHasArmatureParent = skeleton_util.find_armature(context.selected_objects) is not None or (context.active_object is not None and context.active_object.type == "ARMATURE")
-        activeIsVrm = context.active_object is not None and ("vrm_addon_extension" in context.active_object.data and 
-                                                             "vrm0" in context.active_object.data.vrm_addon_extension)
-        return  contextIsObject and selectedHasArmatureParent and activeIsVrm
+        return  contextIsObject and selectedHasArmatureParent and is_vrm0(context.active_object)
 
     def draw(self, context):
         layout = self.layout

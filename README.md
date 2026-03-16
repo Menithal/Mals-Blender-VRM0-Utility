@@ -91,9 +91,13 @@ If you think my stuff is neat, feel free to check my other work at my [ko-fi at 
 
 
 # Change Log
+### Version 0.1.0
+- fix(skeleton): Fixed Issue with VRM0 Skeleton not being detected correctly. Possibly something to do with python version bumps
+- fix(chore): Addressed Deprecation warnings in VRM Addon 3.17. Note Once Major version is out, you need to update to this version
+
 
 ### Version 0.0.13
-- fix(general): Blender 5.x compatability fixes
+- fix: Blender 5.0 compatability fixes
 
 ### Version 0.0.12
 - fix(shapekeys): Added alternative names to vrc to vrm/vsf bindings

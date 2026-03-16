@@ -4,7 +4,7 @@ import re
 from mathutils import Matrix, Vector
 from .vrm_skeleton import skeleton as vrm_skeleton, index_bindings
 from io_extended_scene_vrm.ext.przemir.apply_modifier_for_object_with_shapekeys.ApplyModifierForObjectWithShapeKeys import applyModifierForObjectWithShapeKeys
-from io_extended_scene_vrm.utility import blender_copy_re
+from io_extended_scene_vrm.utility import blender_copy_re, select_vrm_data
 
 def find_armature(selection):
     for selected in selection:
@@ -74,10 +74,9 @@ def pose_armature(armature, current_bindings, data, current_reference_bone, worl
 def get_current_vrm_bindings(selected):
     vrm_binding = dict()
 
-    if(selected.data.get("vrm_addon_extension") is None):
-        raise Exception("Not a VRM Model or not been processed by VRM Blender Addon")
+    extension = select_vrm_data(selected)
 
-    human_bones = selected.data.vrm_addon_extension.vrm0.humanoid.human_bones
+    human_bones = extension.vrm0.humanoid.human_bones
     for i,bone in enumerate(human_bones):
         vrm_binding[i] = bone.node.bone_name
     

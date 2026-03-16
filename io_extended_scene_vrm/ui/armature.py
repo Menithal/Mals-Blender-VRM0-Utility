@@ -2,7 +2,7 @@ import bpy
 
 import re 
 from io_extended_scene_vrm.skeleton import skeleton_util
-from io_extended_scene_vrm.utility import blender_copy_re
+from io_extended_scene_vrm.utility import blender_copy_re, is_vrm0
 
 category = "VRM0 MalAv Tools"
 class ARMATURE_OT_VRM_EXTRA_Create_Armature(bpy.types.Operator):
@@ -181,7 +181,7 @@ class ARMATURE_OT_VRM_EXTRA_Bind_As_SpringBone_Group(bpy.types.Operator):
         secondary_animation = context.active_object.data.vrm_addon_extension.vrm0.secondary_animation
         next_index = len(secondary_animation.bone_groups)
 
-        bpy.ops.vrm.add_vrm0_secondary_animation_group(armature_name=context.active_object.name)
+        bpy.ops.vrm.add_vrm0_secondary_animation_group(armature_object_name=context.active_object.name)
         selected_bone_group = secondary_animation.bone_groups[next_index]
         selected_bone_group.comment = "Generated Springbone Group " + str(next_index+1)
 
@@ -193,7 +193,7 @@ class ARMATURE_OT_VRM_EXTRA_Bind_As_SpringBone_Group(bpy.types.Operator):
 
         bones = context.selected_pose_bones or context.selected_bones
         for bone_index, bone in enumerate(bones):
-            bpy.ops.vrm.add_vrm0_secondary_animation_group_bone(armature_name=context.active_object.name, bone_group_index=next_index)
+            bpy.ops.vrm.add_vrm0_secondary_animation_group_bone(armature_object_name=context.active_object.name, bone_group_index=next_index)
             selected_bone_group.bones[bone_index].bone_name = bone.name
             
         return {'FINISHED'}
@@ -218,10 +218,10 @@ class ARMATURE_OT_VRM_EXTRA_Bind_As_SpringBoneCollider_Group(bpy.types.Operator)
         
         uBones = context.selected_pose_bones or context.selected_bones
         for bone in uBones:
-            bpy.ops.vrm.add_vrm0_secondary_animation_collider_group(armature_name=armature.name)
+            bpy.ops.vrm.add_vrm0_secondary_animation_collider_group(armature_object_name=armature.name)
             secondary_animation.collider_groups[current_length].node.bone_name = bone.name
             secondary_animation.collider_groups[current_length].node.bone_name = bone.name
-            bpy.ops.vrm.add_vrm0_secondary_animation_collider_group_collider(armature_name=armature.name, 
+            bpy.ops.vrm.add_vrm0_secondary_animation_collider_group_collider(armature_object_name=armature.name, 
                                                                              collider_group_index=current_length, bone_name=bone.name)
             secondary_animation.collider_groups[current_length].colliders[0]['bpy_object'].empty_display_size = 0.02
 
@@ -231,7 +231,7 @@ class ARMATURE_OT_VRM_EXTRA_Bind_As_SpringBoneCollider_Group(bpy.types.Operator)
             for ind,springbones in enumerate(secondary_animation.bone_groups):
                 existing_colliders = springbones.collider_groups.keys()
                 if collider.name not in existing_colliders:
-                    bpy.ops.vrm.add_vrm0_secondary_animation_group_collider_group(armature_name=armature.name, bone_group_index=ind)
+                    bpy.ops.vrm.add_vrm0_secondary_animation_group_collider_group(armature_object_name=armature.name, bone_group_index=ind)
                     springbones.collider_groups[len(existing_colliders)].value = collider.name
         
         return {'FINISHED'}
@@ -252,9 +252,9 @@ class ARMATURE_OT_VRM_EXTRA_Clear_SpringBoneColliders(bpy.types.Operator):
         secondary_animation = context.active_object.data.vrm_addon_extension.vrm0.secondary_animation
         for bone in secondary_animation.collider_groups:
             for collider in bone.colliders:
-                bpy.ops.vrm.remove_vrm0_secondary_animation_collider_group_collider(armature_name=context.active_object.name, collider_group_index=0, collider_index=0)
+                bpy.ops.vrm.remove_vrm0_secondary_animation_collider_group_collider(armature_object_name=context.active_object.name, collider_group_index=0, collider_index=0)
             
-            bpy.ops.vrm.remove_vrm0_secondary_animation_collider_group(armature_name=context.active_object.name, collider_group_index=0)
+            bpy.ops.vrm.remove_vrm0_secondary_animation_collider_group(armature_object_name=context.active_object.name, collider_group_index=0)
 
         return {'FINISHED'}
 
@@ -274,7 +274,7 @@ class ARMATURE_OT_VRM_EXTRA_Clear_SpringBones(bpy.types.Operator):
     def execute(self, context):
         secondary_animation = context.active_object.data.vrm_addon_extension.vrm0.secondary_animation
         for bone in secondary_animation.bone_groups:
-           bpy.ops.vrm.remove_vrm0_secondary_animation_group(armature_name=context.active_object.name, bone_group_index=0)
+           bpy.ops.vrm.remove_vrm0_secondary_animation_group(armature_object_name=context.active_object.name, bone_group_index=0)
 
         return {'FINISHED'}
 
@@ -296,10 +296,7 @@ class ARMATURE_PT_VRM_ARMATURE_EXTENDED_TOOLSET(bpy.types.Panel):
         
         contextIsObject = (context.mode == "OBJECT" or context.mode == "POSE" or context.mode == "EDIT_ARMATURE")
         selectedHasArmatureParent = skeleton_util.find_armature(context.selected_objects) is not None or (context.active_object is not None and context.active_object.type == "ARMATURE")
-        activeIsVrm = context.active_object is not None and ("vrm_addon_extension" in context.active_object.data and 
-                                                             "vrm0" in context.active_object.data.vrm_addon_extension)
-
-        return contextIsObject and selectedHasArmatureParent and activeIsVrm
+        return contextIsObject and selectedHasArmatureParent and is_vrm0(context.active_object)
 
     def draw(self, context):
         layout = self.layout
@@ -324,10 +321,8 @@ class ARMATURE_PT_VRM_ARMATURE_SPRINGBONES_EXTENDED_TOOLSET(bpy.types.Panel):
         
         contextIsObject = (context.mode == "POSE" or context.mode == "EDIT_ARMATURE")
         selectedHasArmatureParent = skeleton_util.find_armature(context.selected_objects) is not None or (context.active_object is not None and context.active_object.type == "ARMATURE")
-        activeIsVrm = context.active_object is not None and ("vrm_addon_extension" in context.active_object.data and 
-                                                             "vrm0" in context.active_object.data.vrm_addon_extension)
 
-        return contextIsObject and selectedHasArmatureParent and activeIsVrm
+        return contextIsObject and selectedHasArmatureParent and is_vrm0(context.active_object)
 
     def draw(self, context):
         layout = self.layout
@@ -352,9 +347,8 @@ class ARMATURE_PT_VRM_EXTENDED_REMINDER_TOOLSET(bpy.types.Panel):
     def poll(self, context):
         contextIsObject = (context.mode == "OBJECT" or context.mode == "EDIT_ARMATURE" or context.mode == "POSE")
         selectedHasArmatureParent = skeleton_util.find_armature(context.selected_objects) is not None or (context.active_object is not None and context.active_object.type == "ARMATURE")
-        activeIsVrm = context.active_object is not None and ("vrm_addon_extension" in context.active_object.data and 
-                                                             "vrm0" in context.active_object.data.vrm_addon_extension)
-        return contextIsObject and (not (selectedHasArmatureParent and activeIsVrm)) 
+ 
+        return contextIsObject and (not (selectedHasArmatureParent and is_vrm0(context.active_object))) 
     
 
     def draw(self, context):
